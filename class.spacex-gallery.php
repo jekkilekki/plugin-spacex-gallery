@@ -29,6 +29,7 @@ class Space_X_Gallery {
          * Constructor. Initializes WordPress hooks
          */
         public function __construct() {
+            add_action( 'wp_enqueue_media', array( $this, 'spacex_add_media_option' ) );
             add_action( 'print_media_templates', array( $this, 'spacex_media_templates' ) );
         }
         
@@ -44,6 +45,36 @@ class Space_X_Gallery {
         /**
          * Media UI integration
          */
+        public function spacex_add_media_option() {
+            add_action( 'admin_print_footer_scripts', array( $this, 'spacex_media_gallery_option' ) );
+        }
+        
+        public function spacex_media_gallery_option() {
+            ?>
+            <script type="text/javascript">
+            jQuery( function() {
+                if( wp.media.view.Settings.Gallery ) {
+                    wp.media.view.Settings.Gallery = wp.media.view.Settings.extend({
+                       className: 'collection-settings gallery-settings',
+                       template: wp.media.template( 'gallery-settings' ),
+                       render: function() {
+                           wp.media.View.prototype.render.apply( this, arguments );
+                           // Append our option
+                           var $s = this.$('select.size');
+                           //if( !$s.find( 'option[value="0"]' ).length ) {
+                               $s.append( '<label>SpaceX-ify!!!</label>' );
+                           //}
+                           // Select the correct values.
+                           _( this.model.attributes ).chain().keys().each( this.update, this );
+                           return this;
+                       }
+                    });
+                }
+            });
+            </script>
+            <?php
+        }
+        
         public function spacex_media_templates() {
 
             ?>
