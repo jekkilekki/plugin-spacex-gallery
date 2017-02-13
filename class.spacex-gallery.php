@@ -137,35 +137,48 @@ class Space_X_Gallery {
             }
             
             // Get attributes from shortcode
-            extract( shortcode_atts( array(
+            $atts = shortcode_atts( array(
+                
+                // Default WordPress attributes
                 'order'         => 'ASC',
                 'orderby'       => 'menu_order ID',
                 'id'            => $post->ID,
-                'itemtag'       => 'dl',
-                'icontag'       => 'dt',
-                'captiontag'    => 'dd',
+                'itemtag'       => 'li',
+                'icontag'       => 'figure',
+                'captiontag'    => 'p',
                 'captions'      => 'onhover',
                 'captiontype'   => 'p',
                 'columns'       => 3,
-                'gutterwidth'   => '10',
+                'include'       => '',
+                'exclude'       => '',
                 'link'          => 'post',
                 'size'          => 'medium',
+                
+                // SpaceX Attributes
                 'spacex'        => 'true',
                 'smallspeed'    => 50000,
                 'largespeed'    => 90000,
-                'include'       => '',
-                'exclude'       => ''
-            ), $attr ) );
+                'gutter'        => '10',
+                'overlap'       => '-10'
+                
+            ), $attr );
             
             // Initialize
-            $id = intval( $id );
+            $id = intval( $atts['id'] );
             $attachments = array();
-            if ( 'RAND' == $order ) $orderby = 'none';
+            if ( 'RAND' == $atts['order'] ) 
+                $orderby = 'none';
+            else 
+                $orderby = $atts['orderby'];
+            $include = $atts['include'];
+            $exclude = $atts['exclude'];
+            $order = $atts['order'];
+            $size = $atts['size'];
             
-            if ( ! empty( $include ) ) {
+            if ( ! empty( $atts['include'] ) ) {
                 
                 // If include attribute is present
-                $include = preg_replace( '/[^0-9,]+/', '', $include );
+                //$include = preg_replace( '/[^0-9,]+/', '', $include );
                 $_attachments = get_posts( array( 
                     'include' => $include, 
                     'post_status' => 'inherit', 
@@ -183,7 +196,7 @@ class Space_X_Gallery {
             } else if ( ! empty( $exclude ) ) {
                 
                 // If exclude attribute is present
-                $exclude = preg_replace( '/[^0-9,]+/', '', $exclude );
+                //$exclude = preg_replace( '/[^0-9,]+/', '', $exclude );
                 
                 // Setup attachments array
                 $attachments = get_children( array( 
@@ -220,35 +233,20 @@ class Space_X_Gallery {
             }
             
             // Filter tags and attributes
-            $itemtag = tag_escape( $itemtag );
-            $captiontag = tag_escape( $captiontag );
-            $columns = intval( $columns );
+            $itemtag = tag_escape( $atts['itemtag'] );
+            $icontag = tag_escape( $atts['icontag'] );
+            $captiontag = tag_escape( $atts['captiontag'] );
+            
+            $columns = intval( $atts['columns'] );
             $itemwidth = $columns > 0 ? floor( 100 / $columns ) : 100;
             $float = is_rtl() ? 'right' : 'left';
+            
             $selector = "gallery-{$instance}";
             
-            // Filter gallery CSS
-            $output = apply_filters( 'gallery_style', "
-                <style type='text/css'>
-                    #{$selector} {
-                        margin: auto;
-                    }
-                    #{$selector} .gallery-item {
-                        float: {$float};
-                        margin-top: 10px;
-                        text-align: center;
-                        width: {$itemwidth}%;
-                    }
-                    #{$selector} img {
-                        border: 2px solid #cfcfcf;
-                    }
-                    #{$selector} .gallery-caption {
-                        margin-left: 0;
-                    }
-                </style>
-                <!-- see gallery_shortcode() in wp-includes/media.php -->
-                <div id='$selector' class='gallery galleryid-{$id}'>"
-            );
+            $gallery_style = '';
+            $gallery_div = "<div id='$selector' class='spacex-gallery-wrapper gallery galleryid-{$id} gallery-columns-{$columns} gallery-size-{$size}'>";
+            $output = $gallery_div . "<div class='spacex-gallery'><div id='spacex-cycle-1' class='cycle-slideshow simple-cycle photo-cycle-small' data-speed='60000'>";
+            $output .= "<div class='cycle-group cycle-group-a'><ul class='photo-group'>";
             
             //$images = get_posts( $args );
             
@@ -274,7 +272,7 @@ class Space_X_Gallery {
                     $output .= "
                     <{$captiontag} class='gallery-caption'>
                         " . wptexturize( $attachment->post_excerpt ) . "
-                    </{$captiontag}";
+                    </{$captiontag}>";
                     
                 }
                 
@@ -289,9 +287,14 @@ class Space_X_Gallery {
             // End gallery output
             $output .= "
                 <br style='clear: both;'>
-            </div>\n";
+            </ul></div></div></div></div>\n";
             
             return $output;
+        }
+        
+        public function spacex_enqueue_scripts() {
+            wp_enqueue_style('spacex-gallery-style', plugin_dir_url( __FILE__ ) . 'css/style.css', array(), '170113', true );
+            wp_enqueue_script('spacex-gallery-script', plugin_dir_url( __FILE__ ) . 'js/spacex-gallery-slider.js', array( 'jquery' ), '170113', true );
         }
         
 } // END Space_X_Gallery
