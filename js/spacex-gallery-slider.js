@@ -8,10 +8,18 @@
       largeFirst = $('.photo-cycle-large .cycle-group-a'),
       largeSecond = $('.photo-cycle-large .cycle-group-b');
   
+  console.log( smallSlider );
+  console.log( smallSpeed );
+  console.log( smallFirst );
+  console.log( smallSecond );
   /*
    * Small Gallery Row
    */
   smallFirst.css({
+    '-webkit-animation': 'firstrun ' + smallSpeed/2 + 'ms linear',
+    '-moz-animation': 'firstrun ' + smallSpeed/2 + 'ms linear',
+    '-ms-animation': 'firstrun ' + smallSpeed/2 + 'ms linear',
+    '-o-animation': 'firstrun ' + smallSpeed/2 + 'ms linear',
     'animation': 'firstrun ' + smallSpeed/2 + 'ms linear'
   });
   smallSecond.css({

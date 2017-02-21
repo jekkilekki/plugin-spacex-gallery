@@ -243,9 +243,30 @@ class Space_X_Gallery {
             
             $selector = "gallery-{$instance}";
             
-            $gallery_style = '';
+            
+            
+            $gallery_style = '<style>
+/* Keyframes for Small Row */
+@keyframes firstrun {
+  0%    { left: 0; }
+  100%  { left: -1440px; }
+}
+@keyframes slideshow {
+  0%    { left: 1440px; }
+  100%  { left: -1440px; }
+}
+/* Keyframes for Large Row */
+@keyframes firstrunLG {
+  0%    { left: 0; }
+  100%  { left: -2880px; }
+}
+@keyframes slideshowLG {
+  0%    { left: 2880px; }
+  100%  { left: -2880px; }
+}
+</style>';
             $gallery_div = "<div id='$selector' class='spacex-gallery-wrapper gallery galleryid-{$id} gallery-columns-{$columns} gallery-size-{$size}'>";
-            $output = $gallery_div . "<div class='spacex-gallery'><div id='spacex-cycle-1' class='cycle-slideshow simple-cycle photo-cycle-small' data-speed='60000'>";
+            $output .= $gallery_style . $gallery_div . "<div class='spacex-gallery'><div id='spacex-cycle-1' class='cycle-slideshow simple-cycle photo-cycle-small' data-speed='60000'>";
             $output .= "<div class='cycle-group cycle-group-a'><ul class='photo-group'>";
             
             //$images = get_posts( $args );
@@ -293,7 +314,7 @@ class Space_X_Gallery {
         }
         
         public function spacex_enqueue_scripts() {
-            wp_enqueue_style('spacex-gallery-style', plugin_dir_url( __FILE__ ) . 'css/style.css', array(), '170113', true );
+            wp_enqueue_style('spacex-gallery-style', plugin_dir_url( __FILE__ ) . 'css/style.css', array(), '170113', 'screen' );
             wp_enqueue_script('spacex-gallery-script', plugin_dir_url( __FILE__ ) . 'js/spacex-gallery-slider.js', array( 'jquery' ), '170113', true );
         }
         
