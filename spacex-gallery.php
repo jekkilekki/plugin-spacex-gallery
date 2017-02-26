@@ -36,8 +36,8 @@ define( 'SPACEX_GALLERY_FILE',      __FILE__ );
 
 require_once( SPACEX_GALLERY_DIR . 'class.spacex-gallery.php' );
 
-register_activation_hook( __FILE__, array( 'Space_X_Gallery', 'plugin_activation' ) );
-register_deactivation_hook( __FILE__, array( 'Space_X_Gallery', 'plugin_deactivation' ) );
+//register_activation_hook( __FILE__, array( 'Space_X_Gallery', 'plugin_activation' ) );
+//register_deactivation_hook( __FILE__, array( 'Space_X_Gallery', 'plugin_deactivation' ) );
 
 add_action( 'admin_init', array( Space_X_Gallery::get_instance(), 'init_plugin' ), 20 );
 add_filter( 'post_gallery', array( Space_X_Gallery::get_instance(), 'spacex_post_gallery' ), 11, 2 );
