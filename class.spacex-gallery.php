@@ -155,7 +155,7 @@ class Space_X_Gallery {
                 'size'          => 'medium',
                 
                 // SpaceX Attributes
-                'spacex'        => 'true',
+                'spacex'        => 'false',
                 'smallspeed'    => 50000,
                 'largespeed'    => 90000,
                 'gutter'        => '10',
@@ -174,6 +174,7 @@ class Space_X_Gallery {
             $exclude = $atts['exclude'];
             $order = $atts['order'];
             $size = $atts['size'];
+            $columns = intval( $atts['columns'] );
             
             if ( ! empty( $atts['include'] ) ) {
                 
@@ -223,7 +224,14 @@ class Space_X_Gallery {
                 
             }
             
-            if ( empty( $attachments ) ) return '';
+        /**
+         * If 0 $attachments OR not set to a SpaceX Gallery, return
+         * ---------------------------------------------------------------------
+         */
+            if ( empty( $attachments ) || $atts['spacex'] !== 'true' ) return '';
+        /**
+         * ---------------------------------------------------------------------
+         */
             
             // Filter gallery differently for feeds
             if ( is_feed() ) {
@@ -232,6 +240,156 @@ class Space_X_Gallery {
                 return $output;
             }
             
+        /**
+         * Build Gallery Output
+         * =====================================================================
+         */
+            
+            // Gallery ID
+            $selector = "gallery-{$instance}";
+            
+            // Check number of attachments
+            $count = count( $attachments );
+            $large = false;
+            
+            // If less than 10, only create a SMALL Gallery
+            if ( $count > 10 ) { 
+                $large = true; 
+                array_chunk( $attachments, $count / 2 );
+                $small_gallery = $attachments[0];
+                $large_gallery = $attachments[1];
+            } else {
+                $small_gallery = $attachments;
+                $large_gallery = array();
+            }
+            
+            // If more than 5, split the array and be sure each side has at least 5 images
+            if ( ! empty( $small_gallery ) ) { 
+                // Make sure the array has at least ten items
+                $small_gallery = $this->spacex_fill_cycle( $small_gallery );
+                
+                $small_gallery = array_chunk( $small_gallery, count( $small_gallery ) / 2 );
+                $small_a = $small_gallery[0];
+                $small_b = $small_gallery[1];
+                
+            }
+            
+            // If more than 5, split the array and be sure each side has at least 5 images
+            if ( ! empty( $large_gallery ) ) { 
+                // Make sure the array has at least ten items
+                $large_gallery = $this->spacex_fill_cycle( $large_gallery );
+                
+                $large_gallery = array_chunk( $large_gallery, count( $large_gallery ) / 2 );
+                $large_a = $large_gallery[0];
+                $large_b = $large_gallery[1];
+
+            }
+            
+            $small = $large ? '' : ' spacex-gallery-small';
+            
+            // Gallery Wrapper
+            $output = "
+<div id='$selector' class='spacex-gallery-wrapper{$small} gallery galleryid-{$id} gallery-columns-{$columns} gallery-size-{$size}'>
+    <div class='spacex-gallery{$small}'>
+        <div id='spacex-cycle-1' class='cycle-slideshow simple-cycle photo-cycle-small' data-speed='{$atts['smallspeed']}'>
+            <div class='cycle-group cycle-group-a'>
+                <ul class='photo-group'>";
+            
+                    $output .= $this->spacex_build_gallery_cycle( $small_a, $atts );
+                    
+                    $output .= "
+                </ul>
+            </div><!-- .cycle-group-a -->
+            <div class='cycle-group cycle-group-b'>
+                <ul class='photo-group'>";
+            
+                    $output .= $this->spacex_build_gallery_cycle( $small_b, $atts );
+                    
+                $output .= "
+                </ul>
+            </div><!-- .cycle-group-b -->
+        </div><!-- .photo-cycle-small -->";
+                
+            if( ! empty( $large_gallery ) ) :
+                
+        $output .= "<div id='spacex-cycle-1' class='cycle-slideshow simple-cycle photo-cycle-large' data-speed='{$atts['largespeed']}'>
+            <div class='cycle-group cycle-group-a'>
+                <ul class='photo-group'>";
+            
+                    $output .= $this->spacex_build_gallery_cycle( $large_a, $atts );
+                    
+                    $output .= "
+                </ul>
+            </div><!-- .cycle-group-a -->
+            <div class='cycle-group cycle-group-b'>
+                <ul class='photo-group'>";
+            
+                    $output .= $this->spacex_build_gallery_cycle( $large_b, $atts );
+                    
+                $output .= "
+                </ul>
+            </div><!-- .cycle-group-b -->
+        </div><!-- .photo-cycle-large -->";        
+                
+            endif;
+      
+            
+            // End gallery output
+            $output .= "
+        <br style='clear: both;'>
+    </div><!-- .spacex-gallery -->
+</div><!-- .spacex-gallery-wrapper -->\n";
+            
+            
+            return $output;
+            
+        }
+        
+        /**
+         * Enqueue Scripts function
+         * 
+         * Enqueues the styles and scripts for the plugin
+         */
+        public function spacex_enqueue_scripts() {
+            wp_enqueue_style('spacex-gallery-style', plugin_dir_url( __FILE__ ) . 'css/style.css', array(), '170113', 'screen' );
+            wp_enqueue_script('spacex-gallery-script', plugin_dir_url( __FILE__ ) . 'js/spacex-gallery-slider.js', array( 'jquery' ), '170113', true );
+        }
+        
+        /**
+         * Fill Photo Cycle Function
+         * 
+         * Fills each array with at least 12 items. These are then split into 
+         * A and B which are the actual "moving parts."
+         * 
+         * @param array $array  The array of attachments to be sure there are at least 12 of
+         * @param int   $count  The cut off limit for number of elements (defaults to 13 - so we return 12 by default)
+         * @return array        The FILLED (and/or sliced) array that contains ONLY 12 items (or the number we specify) 
+         */
+        public function spacex_fill_cycle( $array, $count = 13 ) {
+            // Make sure the first half contains at least 5 elements
+            while ( count( $array ) < $count ) {
+                $array = array_merge( $array, $array );
+            }
+            if ( count( $array ) > $count ) {
+                $array = array_slice( $array, 0, $count );
+            }
+            return $array;
+        }
+        
+        /**
+         * Build Gallery Cycle
+         * 
+         * Function that takes our attachments array and attributes and builds 
+         * our HTML output for display on the page.
+         * 
+         * @param array $attachments    The (filled) array of images
+         * @param array $atts           The attributes used to describe our HTML and image element structure
+         * @return String               The HTML that is output to the screen
+         */
+        public function spacex_build_gallery_cycle( $attachments, $atts ) {
+            
+            $size = $atts['size'];
+            
             // Filter tags and attributes
             $itemtag = tag_escape( $atts['itemtag'] );
             $icontag = tag_escape( $atts['icontag'] );
@@ -239,83 +397,36 @@ class Space_X_Gallery {
             
             $columns = intval( $atts['columns'] );
             $itemwidth = $columns > 0 ? floor( 100 / $columns ) : 100;
-            $float = is_rtl() ? 'right' : 'left';
-            
-            $selector = "gallery-{$instance}";
+            $float = is_rtl() ? 'right' : 'left';  
             
             
-            
-            $gallery_style = '<style>
-/* Keyframes for Small Row */
-@keyframes firstrun {
-  0%    { left: 0; }
-  100%  { left: -1440px; }
-}
-@keyframes slideshow {
-  0%    { left: 1440px; }
-  100%  { left: -1440px; }
-}
-/* Keyframes for Large Row */
-@keyframes firstrunLG {
-  0%    { left: 0; }
-  100%  { left: -2880px; }
-}
-@keyframes slideshowLG {
-  0%    { left: 2880px; }
-  100%  { left: -2880px; }
-}
-</style>';
-            $gallery_div = "<div id='$selector' class='spacex-gallery-wrapper gallery galleryid-{$id} gallery-columns-{$columns} gallery-size-{$size}'>";
-            $output .= $gallery_style . $gallery_div . "<div class='spacex-gallery'><div id='spacex-cycle-1' class='cycle-slideshow simple-cycle photo-cycle-small' data-speed='60000'>";
-            $output .= "<div class='cycle-group cycle-group-a'><ul class='photo-group'>";
-            
-            //$images = get_posts( $args );
+            $output = '';
             
             // Iterate through the attachments in this gallery instance
             $i = 0;
+//            echo '<pre>';
+//            var_dump( $attachments );
+//            echo '</pre>';
             foreach ( $attachments as $id => $attachment ) {
                 
                 // Attachment link
-                $link = isset( $attr['link'] ) && 'file' == $attr['link'] ? wp_get_attachment_link( $id, $size, false, false ) : wp_get_attachment_link( $id, $size, true, false );
+                //$link = isset( $atts['guid'] ) /*&& 'file' == $atts['link']*/ ? wp_get_attachment_link( $id, $size, false, false ) : wp_get_attachment_link( $id, $size, true, false );
+//                $link = wp_get_attachment_link( $id, 'medium' );
                 
                 // Begin itemtag
-                $output .= "<{$itemtag} class='gallery-item'>";
+                $output .= "<{$itemtag} class='photo-item'>";
                 
-                // icontag
-                $output .= "
-                <{$icontag} class='gallery-icon'>
-                    $link 
-                </{$icontag}>";
-                
-                if ( $captiontag && trim( $attachment->post_excerpt ) ) {
-                    
-                    // captiontag
-                    $output .= "
-                    <{$captiontag} class='gallery-caption'>
-                        " . wptexturize( $attachment->post_excerpt ) . "
-                    </{$captiontag}>";
-                    
-                }
+                $output .= "<img class='gallery-photo' src='{$attachment->guid}'>";
                 
                 // End itemtag
                 $output .= "</{$itemtag}>";
                 
                 // Line breaks by columns set
-                if ( $columns > 0 && ++$i % $columns == 0 ) $output .= '<br style="clear: both;">';
+                //if ( $columns > 0 && ++$i % $columns == 0 ) $output .= '<br style="clear: both;">';
                     
             }
             
-            // End gallery output
-            $output .= "
-                <br style='clear: both;'>
-            </ul></div></div></div></div>\n";
-            
             return $output;
-        }
-        
-        public function spacex_enqueue_scripts() {
-            wp_enqueue_style('spacex-gallery-style', plugin_dir_url( __FILE__ ) . 'css/style.css', array(), '170113', 'screen' );
-            wp_enqueue_script('spacex-gallery-script', plugin_dir_url( __FILE__ ) . 'js/spacex-gallery-slider.js', array( 'jquery' ), '170113', true );
         }
         
 } // END Space_X_Gallery

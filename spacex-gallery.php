@@ -40,5 +40,5 @@ register_activation_hook( __FILE__, array( 'Space_X_Gallery', 'plugin_activation
 register_deactivation_hook( __FILE__, array( 'Space_X_Gallery', 'plugin_deactivation' ) );
 
 add_action( 'admin_init', array( Space_X_Gallery::get_instance(), 'init_plugin' ), 20 );
-add_filter( 'post_gallery', array( Space_X_Gallery::get_instance(), 'spacex_post_gallery' ), 10, 2 );
+add_filter( 'post_gallery', array( Space_X_Gallery::get_instance(), 'spacex_post_gallery' ), 11, 2 );
 add_action( 'wp_print_scripts', array( Space_X_Gallery::get_instance(), 'spacex_enqueue_scripts' ), 20 );

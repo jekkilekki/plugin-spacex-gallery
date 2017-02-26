@@ -18,7 +18,7 @@
             this.$el.append( media.template( 'spacex-gallery-setting' ) );
             
             // Save the setting
-            media.gallery.defaults.spacex = true;
+            media.gallery.defaults.spacex = false;
             media.gallery.defaults.smallspeed = '50000';
             media.gallery.defaults.largespeed = '90000';
             this.update.apply( this, ['spacex'] );
