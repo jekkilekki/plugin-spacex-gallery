@@ -221,6 +221,10 @@ class Space_X_Gallery {
                 
             }
             
+            echo '<pre>';
+            var_dump( $attachments );
+            echo '</pre>';
+            
         /**
          * If 0 $attachments OR not set to a SpaceX Gallery, return
          * ---------------------------------------------------------------------
@@ -401,9 +405,6 @@ class Space_X_Gallery {
             
             // Iterate through the attachments in this gallery instance
             $i = 0;
-            echo '<pre>';
-            var_dump( $attachments );
-            echo '</pre>';
             foreach ( $attachments as $id => $attachment ) {
                 
                 // Attachment link
