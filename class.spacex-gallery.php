@@ -221,9 +221,9 @@ class Space_X_Gallery {
                 
             }
             
-            echo '<pre>';
-            var_dump( $attachments );
-            echo '</pre>';
+//            echo '<pre>';
+//            var_dump( $attachments );
+//            echo '</pre>';
             
         /**
          * If 0 $attachments OR not set to a SpaceX Gallery, return
