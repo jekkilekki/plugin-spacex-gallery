@@ -2,9 +2,6 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-// Layout
-include_once dirname( __FILE__ ) . '/view.spacex-gallery.php';
-
 if ( ! class_exists( 'Space_X_Gallery' ) ) {
     
 class Space_X_Gallery {
