@@ -256,7 +256,7 @@ class Space_X_Gallery {
             // If less than 10, only create a SMALL Gallery
             if ( $count > 10 ) { 
                 $large = true; 
-                array_chunk( $attachments, $count / 2 );
+                $attachments = array_chunk( $attachments, $count / 2 );
                 $small_gallery = $attachments[0];
                 $large_gallery = $attachments[1];
             } else {

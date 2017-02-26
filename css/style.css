@@ -23,7 +23,7 @@
   width: inherit;
   height: inherit;
   position: absolute;
-  top: 0;
+  /*top: 0;*/
 }
 
 /* Keyframes for Small Row */
@@ -58,6 +58,7 @@
 .photo-cycle-large {
   width: 200%;
   height: 300px;
+  position: relative;
   left: -50%;
   top: -25px;
   z-index: 2;
