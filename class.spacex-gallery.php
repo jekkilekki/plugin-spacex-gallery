@@ -401,9 +401,9 @@ class Space_X_Gallery {
             
             // Iterate through the attachments in this gallery instance
             $i = 0;
-//            echo '<pre>';
-//            var_dump( $attachments );
-//            echo '</pre>';
+            echo '<pre>';
+            var_dump( $attachments );
+            echo '</pre>';
             foreach ( $attachments as $id => $attachment ) {
                 
                 // Attachment link
